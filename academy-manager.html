@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Excellent Academy Manager</title>
+<meta name="theme-color" content="#4f46e5">
+<script src="https://cdn.tailwindcss.com"></script>
+<script>tailwind.config={darkMode:'class'}</script>
+<style>
+:root{--bg1:#eef2ff;--bg2:#f5f3ff}
+.dark{--bg1:#0b1020;--bg2:#171233}
+body{font-family:system-ui,-apple-system,'Segoe UI',sans-serif;background:linear-gradient(160deg,var(--bg1),var(--bg2));min-height:100vh;padding-top:env(safe-area-inset-top,0px)}
+.glass{background:rgba(255,255,255,.68);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);border:1px solid rgba(255,255,255,.7);box-shadow:8px 8px 22px rgba(99,102,180,.16),-6px -6px 16px rgba(255,255,255,.8);transition:transform .25s,box-shadow .25s}
+.dark .glass{background:rgba(30,34,74,.55);border-color:rgba(255,255,255,.08);box-shadow:8px 8px 22px rgba(0,0,0,.45),-4px -4px 14px rgba(99,102,241,.06)}
+.glass.h:hover{transform:translateY(-4px) scale(1.01)}
+.grad{background:linear-gradient(120deg,#2563eb,#7c3aed)}
+.a{animation:up .45s cubic-bezier(.2,.8,.2,1) both}
+@keyframes up{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+.inp{width:100%;padding:.65rem .85rem;border-radius:.9rem;background:rgba(148,163,184,.14);border:1px solid rgba(148,163,184,.3);outline:none;color:inherit}
+.inp:focus{border-color:#7c3aed;box-shadow:0 0 0 3px rgba(124,58,237,.2)}
+.dark .inp option{color:#000}
+.btn{padding:.55rem 1rem;border-radius:.85rem;font-weight:600;transition:.2s;font-size:.85rem}
+.btn:active{transform:scale(.95)}
+.nav.on{color:#7c3aed;transform:translateY(-3px)}
+.dark .nav.on{color:#a78bfa}
+</style></head>
+<body class="text-slate-800 dark:text-slate-100">
+<header class="grad text-white sticky top-0 z-30 shadow-lg" style="padding-top:env(safe-area-inset-top,0px)">
+ <div class="max-w-3xl mx-auto px-4 py-3 flex items-center gap-3">
+  <div class="w-10 h-10 rounded-2xl bg-white/20 flex items-center justify-center text-xl">🎓</div>
+  <div class="flex-1 min-w-0"><div id="an" class="font-bold truncate leading-tight"></div><div class="text-xs opacity-80">Academy Manager Pro</div></div>
+  <button id="ib" onclick="inst()" class="btn bg-white/20 hover:bg-white/30">⬇ Download App</button>
+  <button onclick="dark()" class="w-9 h-9 rounded-xl bg-white/20 text-lg" id="tg">🌙</button>
+ </div>
+</header>
+<main id="app" class="max-w-3xl mx-auto px-4 pt-4 pb-32"></main>
+
+<nav class="fixed bottom-0 inset-x-0 z-30 glass !rounded-none" style="padding-bottom:env(safe-area-inset-bottom,0px)">
+ <div class="max-w-3xl mx-auto grid grid-cols-6 text-center text-[11px] py-2" id="nv"></div>
+</nav>
+
+<button onclick="ai()" class="fixed right-4 bottom-24 z-40 w-14 h-14 rounded-full grad text-2xl text-white shadow-2xl animate-bounce" style="margin-bottom:env(safe-area-inset-bottom,0px)">🤖</button>
+<div id="md" class="fixed inset-0 z-50 hidden items-end sm:items-center justify-center bg-black/50 backdrop-blur-sm p-0 sm:p-4" onclick="if(event.target===this)cm()">
+ <div id="mb" class="glass a w-full max-w-md max-h-[88vh] overflow-y-auto rounded-t-3xl sm:rounded-3xl p-5 !bg-white dark:!bg-slate-900"></div>
+</div>
+<div id="ts" class="fixed top-16 left-1/2 -translate-x-1/2 z-[60] px-4 py-2 rounded-full grad text-white text-sm shadow-xl hidden"></div>
+
+<script>
+const K='eam_pro_v1',$=id=>document.getElementById(id);
+const cur=new Date().toISOString().slice(0,7),today=new Date().toISOString().slice(0,10);
+const CL=[6,7,8,9,10,11,12],rs=n=>'Rs. '+Number(n||0).toLocaleString('en-PK');
+const uid=()=>Date.now().toString(36)+Math.random().toString(36).slice(2,5);
+const esc=s=>String(s||'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+let D,tab='dash',F={m:cur,d:today,c:9,fc:0,q:''},dp=null;
+function seed(){const n=[['Ali Khan','Gul Khan',9],['Ayesha Bibi','Rahmat Ali',10],['Usman Ahmad','Noor Zaman',6],['Hira Fatima','Sher Ali',8],['Zain Ullah','Fazal Haq',12],['Maryam Noor','Anwar Khan',11],['Bilal Shah','Akbar Shah',9],['Sana Gul','Amir Zeb',7]];
+D={set:{name:'The Excellent Academy',fees:{6:1000,7:1000,8:1000,9:1500,10:1500,11:2000,12:2000}},st:[],fees:{},att:{},tests:[]};
+n.forEach((x,i)=>D.st.push({id:uid()+i,name:x[0],father:x[1],cls:x[2],phone:'0300123456'+i,fee:D.set.fees[x[2]]}));
+D.st.slice(0,4).forEach(s=>D.fees[s.id+'|'+cur]=1);save()}
+function load(){try{D=JSON.parse(localStorage.getItem(K))}catch(e){}if(!D)seed()}
+function save(){try{localStorage.setItem(K,JSON.stringify(D))}catch(e){}}
+function toast(t){const e=$('ts');e.textContent=t;e.classList.remove('hidden');clearTimeout(e._t);e._t=setTimeout(()=>e.classList.add('hidden'),2200)}
+function om(h){$('mb').innerHTML=h;$('md').classList.remove('hidden');$('md').classList.add('flex')}
+function cm(){$('md').classList.add('hidden');$('md').classList.remove('flex')}
+function wa(p,m){let n=String(p).replace(/\D/g,'');if(n.startsWith('0'))n='92'+n.slice(1);else if(!n.startsWith('92'))n='92'+n;return 'https://wa.me/'+n+'?text='+encodeURIComponent(m)}
+const okPh=p=>/^03\d{9}$/.test(String(p).replace(/[\s-]/g,''));
+const mname=m=>new Date(m+'-01').toLocaleString('en',{month:'long',year:'numeric'});
+const paid=(s,m)=>D.fees[s.id+'|'+m];
+const A='target="_blank" rel="noopener"';
+const clsSel=(v,all,id)=>`<select id="${id||''}" class="inp" onchange="${id==='fcs'?'F.fc=+this.value':'F.c=+this.value'};R()">${all?'<option value="0">All Classes</option>':''}${CL.map(c=>`<option value="${c}" ${c==v?'selected':''}>${c}th</option>`).join('')}</select>`;
+const card=(h,i=0,x='')=>`<div class="glass h a rounded-3xl p-4 ${x}" style="animation-delay:${i*60}ms">${h}</div>`;
+
+const T=[['dash','🏠','Home'],['stu','👨‍🎓','Students'],['fee','💰','Fees'],['att','📋','Attendance'],['tst','📝','Tests'],['set','⚙️','More']];
+function R(){$('an').textContent=D.set.name;
+$('nv').innerHTML=T.map(t=>`<button onclick="tab='${t[0]}';R()" class="nav ${tab==t[0]?'on':''} transition-all py-1"><div class="text-xl">${t[1]}</div>${t[2]}</button>`).join('');
+$('app').innerHTML=V[tab]();scrollTo({top:0})}
+
+const V={
+dash(){const S=D.st,col=S.filter(s=>paid(s,cur)).reduce((a,s)=>a+s.fee,0),pen=S.filter(s=>!paid(s,cur)).reduce((a,s)=>a+s.fee,0);
+const td=S.map(s=>D.att[today+'|'+s.id]).filter(Boolean),pr=td.filter(x=>x=='P').length,mx=Math.max(1,...CL.map(c=>S.filter(s=>s.cls==c).length));
+const st=[['👨‍🎓','Students',S.length,'from-blue-500 to-indigo-500'],['✅','Collected',rs(col),'from-emerald-500 to-teal-500'],['⏳','Pending',rs(pen),'from-orange-500 to-rose-500'],['📋','Today Present',td.length?pr+'/'+td.length:'—','from-violet-500 to-fuchsia-500']];
+return `<div class="a mb-4"><div class="text-sm opacity-60">Assalam o Alaikum 👋</div><h1 class="text-2xl font-extrabold">Dashboard</h1><div class="text-xs opacity-60">${mname(cur)}</div></div>
+<div class="grid grid-cols-2 gap-3">${st.map((x,i)=>card(`<div class="w-10 h-10 rounded-2xl bg-gradient-to-br ${x[3]} flex items-center justify-center text-lg shadow-lg mb-2">${x[0]}</div><div class="text-xs opacity-60">${x[1]}</div><div class="text-lg font-extrabold">${x[2]}</div>`,i)).join('')}</div>
+${card(`<div class="font-bold mb-3">Class-wise Students</div>${CL.map(c=>{const n=S.filter(s=>s.cls==c).length;return `<div class="flex items-center gap-2 mb-2 text-sm"><div class="w-9">${c}th</div><div class="flex-1 h-3 rounded-full bg-slate-400/20 overflow-hidden"><div class="h-full grad rounded-full transition-all duration-700" style="width:${n/mx*100}%"></div></div><div class="w-6 text-right font-semibold">${n}</div></div>`}).join('')}`,5,'mt-3')}
+<div class="grid grid-cols-3 gap-3 mt-3 text-center text-sm font-semibold">
+${[['+ Student',"stf()"],['Mark Attendance',"tab='att';R()"],['New Test',"tf()"]].map((x,i)=>`<button onclick="${x[1]}" class="glass h a rounded-2xl py-4" style="animation-delay:${400+i*60}ms">${x[0]}</button>`).join('')}</div>`},
+
+stu(){return `<div class="flex items-center justify-between mb-3 a"><h1 class="text-2xl font-extrabold">Students</h1><button onclick="stf()" class="btn grad text-white shadow-lg">+ Add</button></div>
+<div class="grid grid-cols-2 gap-2 mb-3"><input class="inp" placeholder="🔍 Search name" value="${esc(F.q)}" oninput="F.q=this.value;sl()">${clsSel(F.fc,1,'fcs')}</div><div id="sl">${slh()}</div>`},
+fee(){const L=D.st.filter(s=>!F.fc||s.cls==F.fc),c=L.filter(s=>paid(s,F.m)).reduce((a,s)=>a+s.fee,0),p=L.filter(s=>!paid(s,F.m)).reduce((a,s)=>a+s.fee,0);
+return `<h1 class="text-2xl font-extrabold mb-3 a">Fee Management</h1><div class="grid grid-cols-2 gap-2 mb-3"><input type="month" class="inp" value="${F.m}" onchange="F.m=this.value;R()">${clsSel(F.fc,1,'fcs')}</div>
+<div class="grid grid-cols-2 gap-3 mb-3">${card(`<div class="text-xs opacity-60">Collected</div><div class="font-extrabold text-emerald-500">${rs(c)}</div>`)}${card(`<div class="text-xs opacity-60">Pending</div><div class="font-extrabold text-rose-500">${rs(p)}</div>`,1)}</div>
+${L.map((s,i)=>{const pd=paid(s,F.m);return card(`<div class="flex items-center gap-3"><div class="flex-1 min-w-0"><div class="font-semibold truncate">${esc(s.name)}</div><div class="text-xs opacity-60">${s.cls}th • ${rs(s.fee)}</div></div>
+<a ${A} href="${wa(s.phone,pd?`Assalam o Alaikum ${s.father}. ${s.name} ki ${mname(F.m)} ki fee ${rs(s.fee)} wasool ho gayi hai. Shukriya! - ${D.set.name}`:`Assalam o Alaikum ${s.father}. ${s.name} ki ${mname(F.m)} ki fee ${rs(s.fee)} baqaya hai. Barae meherbani jald ada karein. Shukriya - ${D.set.name}`)}" class="btn bg-green-500 text-white">WA</a>
+<button onclick="pf('${s.id}')" class="btn ${pd?'bg-emerald-500 text-white':'bg-rose-500/90 text-white'}">${pd?'Paid ✓':'Unpaid'}</button></div>`,Math.min(i,8),'mb-2 !p-3')}).join('')||'<p class="opacity-60">No students</p>'}`},
+att(){const L=D.st.filter(s=>s.cls==F.c);return `<h1 class="text-2xl font-extrabold mb-3 a">Attendance</h1><div class="grid grid-cols-2 gap-2 mb-3"><input type="date" class="inp" value="${F.d}" onchange="F.d=this.value;R()">${clsSel(F.c,0)}</div>
+${L.map((s,i)=>{const v=D.att[F.d+'|'+s.id];return card(`<div class="flex items-center gap-2"><div class="flex-1 min-w-0 font-semibold truncate">${esc(s.name)}</div>
+${v=='A'?`<a ${A} href="${wa(s.phone,`Assalam o Alaikum ${s.father}. Aap ka bacha ${s.name} aaj (${F.d}) academy nahi aaya. Khairiyat? - ${D.set.name}`)}" class="btn bg-green-500 text-white">WA</a>`:''}
+<button onclick="sa('${s.id}','P')" class="btn ${v=='P'?'bg-emerald-500 text-white':'bg-slate-400/20'}">P</button><button onclick="sa('${s.id}','A')" class="btn ${v=='A'?'bg-rose-500 text-white':'bg-slate-400/20'}">A</button></div>`,Math.min(i,8),'mb-2 !p-3')}).join('')||'<p class="opacity-60">No students in this class</p>'}`},
+tst(){return `<div class="flex items-center justify-between mb-3 a"><h1 class="text-2xl font-extrabold">Tests</h1><button onclick="tf()" class="btn grad text-white shadow-lg">+ New Test</button></div>
+${[...D.tests].reverse().map((t,i)=>card(`<button class="w-full text-left" onclick="tm('${t.id}')"><div class="font-bold">${esc(t.sub)} <span class="text-xs opacity-60">• ${t.cls}th</span></div><div class="text-xs opacity-60">${t.date} • 11:00 AM • Total ${t.tot} marks</div></button>`,i,'mb-2')).join('')||'<p class="opacity-60">Koi test nahi. + New Test dabayein.</p>'}`},
+set(){return `<h1 class="text-2xl font-extrabold mb-3 a">Settings & Backup</h1>
+${card(`<div class="font-bold mb-2">Academy</div><input id="sn" class="inp mb-2" value="${esc(D.set.name)}"><div class="text-sm font-semibold mb-1">Monthly Fee (Rs.)</div><div class="grid grid-cols-4 gap-2">${CL.map(c=>`<label class="text-xs">${c}th<input id="sf${c}" type="number" class="inp !p-2" value="${D.set.fees[c]}"></label>`).join('')}</div><button onclick="ss()" class="btn grad text-white w-full mt-3">Save Settings</button>`)}
+${card(`<div class="font-bold mb-2">💾 Backup</div><div class="grid grid-cols-2 gap-2"><button onclick="bk()" class="btn grad text-white">Download Backup</button><label class="btn bg-slate-400/25 text-center cursor-pointer">Restore<input type="file" accept=".json" class="hidden" onchange="rs2(this)"></label></div><button onclick="if(confirm('Sab data delete ho jayega. Pakka?')){localStorage.removeItem(K);load();D.st=[];D.fees={};save();R();toast('Data clear')}" class="btn text-rose-500 w-full mt-2">Clear All Data</button>`,1,'mt-3')}
+<p class="text-center text-xs opacity-50 mt-4">Data sirf is device ke browser mein save hota hai (offline). Regular backup lein.</p>`}};
+
+function slh(){const q=F.q.toLowerCase();return D.st.filter(s=>(!F.fc||s.cls==F.fc)&&s.name.toLowerCase().includes(q)).map((s,i)=>card(`<div class="flex items-center gap-3"><div class="w-11 h-11 rounded-2xl grad text-white flex items-center justify-center font-bold">${esc(s.name[0])}</div><div class="flex-1 min-w-0"><div class="font-semibold truncate">${esc(s.name)}</div><div class="text-xs opacity-60">s/o ${esc(s.father)} • ${s.cls}th • ${rs(s.fee)}</div><div class="text-xs opacity-60">${esc(s.phone)}</div></div><button onclick="stf('${s.id}')" class="btn bg-slate-400/20">✏️</button><button onclick="ds('${s.id}')" class="btn bg-rose-500/15 text-rose-500">🗑</button></div>`,Math.min(i,8),'mb-2 !p-3')).join('')||'<p class="opacity-60">Koi student nahi</p>'}
+function sl(){$('sl').innerHTML=slh()}
+function stf(id){const s=D.st.find(x=>x.id==id)||{cls:9,fee:D.set.fees[9]};
+om(`<h2 class="font-bold text-lg mb-3">${id?'Edit':'Add'} Student</h2><div class="space-y-2"><input id="f1" class="inp" placeholder="Student name" value="${esc(s.name)}"><input id="f2" class="inp" placeholder="Father name" value="${esc(s.father)}">
+<select id="f3" class="inp" onchange="$('f5').value=D.set.fees[this.value]">${CL.map(c=>`<option value="${c}" ${c==s.cls?'selected':''}>${c}th</option>`).join('')}</select>
+<input id="f4" class="inp" inputmode="numeric" placeholder="WhatsApp 03XXXXXXXXX" value="${esc(s.phone)}"><input id="f5" type="number" class="inp" placeholder="Monthly fee Rs." value="${s.fee}"></div>
+<div class="flex gap-2 mt-4"><button onclick="cm()" class="btn bg-slate-400/25 flex-1">Cancel</button><button onclick="sv('${id||''}')" class="btn grad text-white flex-1">Save</button></div>`)}
+function sv(id){const n=$('f1').value.trim(),p=$('f4').value.replace(/[\s-]/g,'');if(!n)return toast('Naam likhein');if(!okPh(p))return toast('Number 03XXXXXXXXX hona chahiye');
+const o={name:n,father:$('f2').value.trim(),cls:+$('f3').value,phone:p,fee:+$('f5').value||0};
+if(id)Object.assign(D.st.find(x=>x.id==id),o);else D.st.push({id:uid(),...o});save();cm();R();toast('Saved ✓')}
+function ds(id){if(confirm('Student delete karein?')){D.st=D.st.filter(s=>s.id!=id);save();R()}}
+function pf(id){const k=id+'|'+F.m;D.fees[k]?delete D.fees[k]:D.fees[k]=1;save();R()}
+function sa(id,v){const k=F.d+'|'+id;D.att[k]==v?delete D.att[k]:D.att[k]=v;save();R()}
+function tf(){om(`<h2 class="font-bold text-lg mb-3">New Test (11:00 AM)</h2><div class="space-y-2"><select id="t1" class="inp">${CL.map(c=>`<option value="${c}">${c}th</option>`).join('')}</select><input id="t2" class="inp" placeholder="Subject (e.g. Maths)"><input id="t3" type="date" class="inp" value="${today}"><input id="t4" type="number" class="inp" placeholder="Total marks" value="50"></div>
+<div class="flex gap-2 mt-4"><button onclick="cm()" class="btn bg-slate-400/25 flex-1">Cancel</button><button onclick="tsv()" class="btn grad text-white flex-1">Create</button></div>`)}
+function tsv(){const s=$('t2').value.trim();if(!s)return toast('Subject likhein');D.tests.push({id:uid(),cls:+$('t1').value,sub:s,date:$('t3').value,tot:+$('t4').value||100,m:{}});save();cm();tab='tst';R()}
+function tm(id){const t=D.tests.find(x=>x.id==id),L=D.st.filter(s=>s.cls==t.cls);
+om(`<h2 class="font-bold text-lg">${esc(t.sub)} • ${t.cls}th</h2><div class="text-xs opacity-60 mb-3">${t.date} • 11:00 AM • /${t.tot}</div>${L.map(s=>`<div class="flex items-center gap-2 mb-2"><div class="flex-1 truncate text-sm font-semibold">${esc(s.name)}</div><input id="m_${s.id}" type="number" max="${t.tot}" class="inp !w-20 !p-2" value="${t.m[s.id]??''}"><button onclick="wr('${t.id}','${s.id}')" class="btn bg-green-500 text-white !px-2">WA</button></div>`).join('')||'<p>Is class mein student nahi</p>'}
+<div class="flex gap-2 mt-4"><button onclick="if(confirm('Test delete?')){D.tests=D.tests.filter(x=>x.id!='${id}');save();cm();R()}" class="btn bg-rose-500/15 text-rose-500">🗑</button><button onclick="tms('${id}')" class="btn grad text-white flex-1">Save Marks</button></div>`)}
+function tms(id){const t=D.tests.find(x=>x.id==id);D.st.filter(s=>s.cls==t.cls).forEach(s=>{const v=$('m_'+s.id).value;if(v==='')delete t.m[s.id];else t.m[s.id]=+v});save();cm();toast('Marks saved ✓')}
+function wr(tid,sid){const t=D.tests.find(x=>x.id==tid),s=D.st.find(x=>x.id==sid),v=$('m_'+sid).value;if(v==='')return toast('Pehle marks likhein');
+window.open(wa(s.phone,`Assalam o Alaikum ${s.father}. ${s.name} ne ${t.sub} ke test (${t.date}) mein ${v}/${t.tot} marks liye. - ${D.set.name}`),'_blank')}
+function ss(){D.set.name=$('sn').value.trim()||D.set.name;CL.forEach(c=>D.set.fees[c]=+$('sf'+c).value||0);save();R();toast('Settings saved ✓')}
+function bk(){const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([JSON.stringify(D)],{type:'application/json'}));a.download='academy-backup-'+today+'.json';a.click();toast('Backup download ho gaya')}
+function rs2(i){const f=i.files[0];if(!f)return;const r=new FileReader();r.onload=()=>{try{const d=JSON.parse(r.result);if(!d.st||!d.set)throw 0;D=d;save();R();toast('Restore ho gaya ✓')}catch(e){toast('Galat backup file')}};r.readAsText(f)}
+
+/* AI assistant — Roman Urdu */
+let chat=[['b','Assalam o Alaikum! 👋 Main aap ka AI assistant hun. Try karein:<br>• <i>Ali ki fee jama karo</i><br>• <i>9th ke defaulter dikhao</i><br>• <i>add Ahmed 9th 03001234567</i><br>• <i>aaj ki attendance</i><br>• <i>kitne students hain</i>']];
+function ai(){om(`<div class="flex items-center justify-between mb-2"><h2 class="font-bold text-lg">🤖 AI Assistant</h2><button onclick="cm()" class="text-xl">✕</button></div><div id="cl" class="space-y-2 max-h-[48vh] overflow-y-auto mb-3 text-sm"></div><div class="flex gap-2"><input id="ci" class="inp" placeholder="Roman Urdu mein likhein..." onkeydown="if(event.key=='Enter')cs()"><button onclick="cs()" class="btn grad text-white">➤</button></div>`);cr()}
+function cr(){$('cl').innerHTML=chat.map(c=>`<div class="${c[0]=='u'?'ml-8 grad text-white':'mr-8 bg-slate-400/15'} rounded-2xl px-3 py-2">${c[1]}</div>`).join('');$('cl').scrollTop=1e9}
+function cs(){const q=$('ci').value.trim();if(!q)return;chat.push(['u',esc(q)]);chat.push(['b',cmd(q)]);cr();$('ci').value='';R()}
+function cmd(q){const l=q.toLowerCase(),ph=(q.match(/03\d{9}/)||[])[0],cn=(l.replace(/03\d{9}/,'').match(/\b(6|7|8|9|10|11|12)\s*(?:th|vi|wi|ve|class)?\b/)||[])[1],S=D.st.filter(s=>!cn||s.cls==cn);
+let m;
+if(ph&&(m=l.match(/(?:add|shamil|dakhil|naya)\s+(?:student\s+)?([a-z ]+?)\s+(?:class\s+)?(\d{1,2})/))){const c=+m[2];if(!CL.includes(c))return 'Class 6 se 12 tak honi chahiye.';const n=m[1].replace(/\b(student|ko|ka)\b/g,'').trim().replace(/\b\w/g,x=>x.toUpperCase());D.st.push({id:uid(),name:n,father:'',cls:c,phone:ph,fee:D.set.fees[c]});save();return `✅ ${esc(n)} (${c}th) add ho gaya. Fee ${rs(D.set.fees[c])}.`}
+if(/(jama|paid|ada|wasool)/.test(l)&&/fee/.test(l)&&(m=l.match(/(.+?)\s+(?:ki|ka|ke)\s+fee/))){const n=m[1].trim().split(' ').pop(),s=D.st.find(x=>x.name.toLowerCase().includes(n));if(!s)return `❌ "${esc(n)}" naam ka student nahi mila.`;D.fees[s.id+'|'+cur]=1;save();return `✅ ${esc(s.name)} ki ${mname(cur)} ki fee ${rs(s.fee)} jama ho gayi.`}
+if(/(defaulter|baqaya|pending|unpaid|nahi di)/.test(l)){const L=S.filter(s=>!paid(s,cur));return L.length?`💰 ${L.length} students ki fee baqaya (${rs(L.reduce((a,s)=>a+s.fee,0))}):<br>`+L.map(s=>`• ${esc(s.name)} (${s.cls}th) ${rs(s.fee)} <a ${A} class="text-green-600 font-bold underline" href="${wa(s.phone,`Assalam o Alaikum ${s.father}. ${s.name} ki ${mname(cur)} ki fee ${rs(s.fee)} baqaya hai. Jald ada karein. - ${D.set.name}`)}">WhatsApp</a>`).join('<br>'):'🎉 Sab ki fee jama hai!'}
+if(/(attendance|hazri|haziri)/.test(l)){const a=S.filter(s=>D.att[today+'|'+s.id]=='A');const p=S.filter(s=>D.att[today+'|'+s.id]=='P').length;return `📋 Aaj: ${p} present, ${a.length} absent.`+(a.length?'<br>Absent: '+a.map(s=>esc(s.name)).join(', '):'')}
+if(/(kitni|total|kul).*(fee|collection|wasool)/.test(l)){return `💵 ${mname(cur)} ki wasooli: ${rs(S.filter(s=>paid(s,cur)).reduce((a,s)=>a+s.fee,0))}`}
+if(/(kitne|total|kul|count).*(student|talib|bachay)/.test(l))return `👨‍🎓 ${cn?cn+'th mein ':'Total '}${S.length} students hain.`;
+if(/(dark|raat)/.test(l)){dark();return '🌙 Theme badal diya.'}
+return 'Maaf kijiye, samajh nahi aaya 😅 Examples: "Ali ki fee jama karo", "9th ke defaulter", "aaj ki attendance", "kitne students hain".'}
+
+/* Theme + PWA */
+function dark(f){const d=f===undefined?!document.documentElement.classList.contains('dark'):f;document.documentElement.classList.toggle('dark',d);$('tg').textContent=d?'☀️':'🌙';try{localStorage.setItem('eam_dark',d?1:0)}catch(e){}}
+let dp2=null;addEventListener('beforeinstallprompt',e=>{e.preventDefault();dp2=e});
+addEventListener('appinstalled',()=>{$('ib').style.display='none'});
+function inst(){if(dp2){dp2.prompt();dp2=null}else om(`<h2 class="font-bold text-lg mb-2">📲 App Install karein</h2><p class="text-sm"><b>Android (Chrome):</b> ⋮ menu → <i>Add to Home screen / Install app</i>.<br><b>iPhone (Safari):</b> Share → <i>Add to Home Screen</i>.<br><b>Computer:</b> address bar mein install icon dabayein.</p><button onclick="cm()" class="btn grad text-white w-full mt-4">Theek hai</button>`)}
+try{const ic="data:image/svg+xml,"+encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><rect width="512" height="512" rx="110" fill="#4f46e5"/><text x="256" y="340" font-size="260" text-anchor="middle">🎓</text></svg>');
+const mf=new Blob([JSON.stringify({name:'Excellent Academy Manager',short_name:'Academy',display:'standalone',background_color:'#4f46e5',theme_color:'#4f46e5',icons:[{src:ic,sizes:'512x512',type:'image/svg+xml'}]})],{type:'application/manifest+json'});
+const l=document.createElement('link');l.rel='manifest';l.href=URL.createObjectURL(mf);document.head.appendChild(l);
+if('serviceWorker' in navigator)navigator.serviceWorker.register('sw.js').catch(()=>{})}catch(e){}
+load();try{dark(localStorage.getItem('eam_dark')==='1')}catch(e){}R();
+</script></body></html>
